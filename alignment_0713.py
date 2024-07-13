@@ -65,6 +65,7 @@ for i in tqdm(range(len(adata_list) - 1)):
 '''保存变量'''
 with open(dir + 'pairwise_index_5000spot_0713.pkl', 'wb') as file:
     pickle.dump(all_pairwise_index, file)
+print('all_pairwise_index saved')
 
 
 def track_sequence(start, arrays):
@@ -85,3 +86,8 @@ paths = np.array([track_sequence(i, all_pairwise_index) for i in range(5000)])
 '''保存变量'''
 with open(dir + 'track_sequence_5000spot_0713.pkl', 'wb') as file:
     pickle.dump(paths, file)
+print('paths saved')
+
+'''加载变量'''
+# with open('variable_a.pkl', 'rb') as file:
+#     loaded_a = pickle.load(file)
