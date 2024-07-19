@@ -9,30 +9,13 @@ import ot
 import torch
 import matplotlib.pyplot as plt
 from scipy.sparse import coo_matrix
+import anndata as ad
 
+dataset_path = '/home/hanyuji/Workbench/ST/ST_data_check/paste_alignment_cortex/PASTE_align/cortex_macaque1_119slice_subset_5000spot_2000gene_HVG.h5ad'
+adata = sc.read_h5ad(dataset_path)
 
-dataset_HVG_path = '/home/hanyuji/Workbench/ST/ST_data_check/paste_alignment_cortex/PASTE_align/cortex_macaque1_119slice_subset_12000spot_2000gene_HVG.h5ad'
-
-adata = sc.read_h5ad(dataset_HVG_path)
-
-
-def random_subset(adata, cell_num=5000):
-    '''随机选取 5000 个细胞'''
-
-    random_indices = np.random.choice(
-        adata.n_obs, cell_num, replace=False
-    )  # 从 276593 个细胞中随机选取 3000 个细胞的索引
-    adata_subset = adata[random_indices, :]  # 使用选取的索引创建新的 AnnData 对象
-
-    return adata_subset
-
-
-# 根据batch值分开成多个AnnData对象
 unique_batches = adata.obs['batch'].unique()
-adata_list = [
-    random_subset(adata[adata.obs['batch'] == batch].copy()) for batch in unique_batches
-]
-# adata_list = [adata[adata.obs['batch'] == batch].copy() for batch in unique_batches]
+adata_list = [adata[adata.obs['batch'] == batch].copy() for batch in unique_batches]
 
 
 def get_edge_index(M):
@@ -43,11 +26,12 @@ def get_edge_index(M):
     return indices
 
 
-torch.cuda.set_device(0)  # 将设备设置为 'cuda:0'
+torch.cuda.set_device(1)  # 将设备设置为 'cuda:0'
 
 import pickle
 
 dir = '/home/hanyuji/Workbench/ST/ST_data_check/paste_alignment_cortex/PASTE_align/'  # 保存的位置
+
 
 all_pairwise_index = []
 for i in tqdm(range(len(adata_list) - 1)):
@@ -63,7 +47,7 @@ for i in tqdm(range(len(adata_list) - 1)):
 
 
 '''保存变量'''
-with open(dir + 'pairwise_index_5000spot_0713.pkl', 'wb') as file:
+with open(dir + 'pairwise_index_5000spot_0715.pkl', 'wb') as file:
     pickle.dump(all_pairwise_index, file)
 print('all_pairwise_index saved')
 
@@ -84,10 +68,8 @@ paths = np.array([track_sequence(i, all_pairwise_index) for i in range(5000)])
 
 
 '''保存变量'''
-with open(dir + 'track_sequence_5000spot_0713.pkl', 'wb') as file:
-    pickle.dump(paths, file)
+np.save(dir + 'track_sequence_5000spot_0715.pkl', paths)
 print('paths saved')
 
-'''加载变量'''
-# with open('variable_a.pkl', 'rb') as file:
-#     loaded_a = pickle.load(file)
+
+paths[42]
